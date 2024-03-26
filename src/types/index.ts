@@ -1,5 +1,3 @@
-//SECTION: MODELS
-
 export type Category =
 	| 'софт-скил'
 	| 'другое'
@@ -19,7 +17,7 @@ export interface IItem extends IItemShort {
 	category: Category;
 }
 
-export interface IItemCatalogue {
+export interface IItemCatalogueModel {
 	items: Set<IItem>;
 	addItem: (item: IItem) => void;
 	addItems: (items: IItem[]) => void;
@@ -27,25 +25,17 @@ export interface IItemCatalogue {
 	getItems: () => IItem[];
 }
 
-export enum PaymentMethod {
-	ONLINE = 'online',
-	ON_ARRIVAL = 'on_arrival',
-}
-
-// + IOrderForm 
-export interface IFormInfo {
-	paymentMethod: PaymentMethod;
+// + IOrderForm
+export interface IOrderFormData {
+	payment: string;
 	address: string;
 	email: string;
 	phone: string;
-}
-// + IOrderForm 
-export interface IOrder extends IFormInfo {
 	items: string[];
 	total: number;
 }
 
-export interface IBasket {
+export interface IBasketModel {
 	items: IItem[];
 	addItem: (item: IItem) => void;
 	removeItemById: (id: number) => void;
@@ -54,7 +44,7 @@ export interface IBasket {
 	getCost: () => number;
 }
 
-export type FormErrors = Partial<Record<keyof IFormInfo, string>>;
+export type FormErrors = Partial<Record<keyof IOrderFormData, string>>;
 
 export interface IOrderResult {
 	id: string;
@@ -62,21 +52,54 @@ export interface IOrderResult {
 }
 
 export interface IAppState {
-	catalog: IItemCatalogue[];
+	catalog: IItemCatalogueModel;
 	basket: IBasket;
-	preview: string | null;
-	order: IOrder | null;
-	loading: boolean;
+	order: IOrderFormData;
 }
 
+export interface IOrderFormModel extends IOrderFormData{
+	softValidate():boolean;
+	hardValidate():boolean;
+}
 //SECTION: VIEWS
 
-export interface ISuccess{
-    description: string;
+export interface ISuccess {
+	description: string;
 }
 
-export interface IPage{
+export interface IPage {
 	counter: number;
 	catalog: HTMLElement[];
 	locked: boolean;
+}
+
+export interface IItemShort {
+	id: string;
+	title: string;
+	price: number;
+}
+
+export interface ICatalogItem {
+	buttonState: boolean;
+}
+
+export interface IBasketCard {
+	index: number;
+}
+
+export interface IModalData {
+	content: HTMLElement;
+}
+
+export interface IFormState {
+	valid: boolean;
+	errors: string[];
+}
+
+export interface IOrderForm extends IOrderFormData, IFormState {}
+
+export interface IBasket {
+	items: HTMLElement[];
+	total: number;
+	enable: boolean;
 }
