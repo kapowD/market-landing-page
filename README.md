@@ -58,6 +58,10 @@ npm run build
 
 ## Реализация
 
+## Об архитектуре
+
+Взаимодействия внутри приложения происходят через события. Модели инициализируют события, слушатели событий в основном коде выполняют передачу данных компонентам отображения, а также вычислениями между этой передачей, и еще они меняют значения в моделях.
+
 Данное приложение было реализовано с помощью архитектуры MVP:
 
 - **Model** - модель данных;
@@ -66,38 +70,56 @@ npm run build
 
 ## БАЗОВЫЙ КОД
 
-### Api
+### Class `Api`
 
-Отправляет и принимает данные с сервера
+Класс для работы с API. Отправляет и принимает данные с сервера
 
 ![alt text](./uml_images/image-26.png)
 
-- `baseUrl` - приниамет базовый адрес
-- `options`- данные для запросов,
+`constructor(baseUrl: string, options: RequestInit = {})` - принимает url и опции запроса
+
+Свойства:
+
+- `baseUrl` - принимает базовый URL
+- `options`- данные для запросов
+
+Методы:
+
 - `handleResponse` - проверяет ответ сервера, может вернуть ошибку или данные
 - `get` - получает данные
 - `post` - отправляет данные
 
-### ShopAPI
+### Class `ShopAPI`
 
 ![alt text](./uml_images/image-27.png)
 
-Предоставляет методы для взаимодействия с внешним апи
+Предоставляет методы для взаимодействия с внешним апи. Наследуется от `Api`
+
+`constructor(cdn: string, baseUrl: string, options?: RequestInit)` - создает новый экземпляр ShopAPI с CDN, URL и опциями
+
+Свойства:
 
 - `cdn` - CDN
+
+Методы:
+
 - `getProductItem()` - получить данные товара
 - `getProductList()` - получить данные каталога
 - `orderProduct()` - отправить данные заказа
 
-### EventEmitter
+### Class `EventEmitter`
 
-Представляет из себя паттерн Observer. Обеспечивает работу событий
+Представляет из себя паттерн Observer. Обеспечивает работу событий. Позволяет установить и снять слушатели событий, а также вызывать слушатели при возникновении события
 
 ![alt text](./uml_images/image-28.png)
 
-<!-- - установка и снятие слушателя событий, а также вызов слушателя при возникновении события; -->
 
-- `events` - типы событий и их обработчики
+Свойства:
+
+- `events` - хранит типы событий и их обработчики
+
+Методы:
+
 - `on()` - установить/Снять обработчик на событие
 - `off()` - снять обработчик на событие
 - `emit()` - инициировать событие с данными
@@ -105,136 +127,49 @@ npm run build
 - `offAll()` - сбросить все события
 - `trigger()` - сделать коллбек триггер, генерирующий событие при вызове
 
-<!-- ## Ключевые типы данных
-
-### ICard
-
-```ts
-export interface ICard = {
-id: string,
-description?: string,
-image: string,
-title: string,
-category: Category,
-price: number
-}
-```
-
-### IItemCatalogue
-
-Описывает коллекцию каталога предметов, потображаемых на главной странцие
-
-```ts
-export interface ItemCatalogue {
-	items: Set<IItem>;
-	addItem: (item: IItem) => void;
-	addItems: (items: IItem[]) => void;
-	getItemByID: (id: IItem) => IItem;
-	getItems: () => IItem[];
-}
-```
-
-### IPayment
-
-```ts
-Описывает способ оплаты и адрес доставки
-export interface IPayment {
-paymentMethod: PaymentMethod
-address: string
-}
-```
-
-### IOrderForm
-
-Описывает форму заказа данных о заказчике
-
-```ts
-export interface IOrderForm {
-	email: string;
-	phone: string;
-}
-```
-
-### IOrderInfo
-
-Описывает способ оплаты и позволяет ввести адрес доставки заказа. IPayment обеспечивает удобный способ представления и использования различных методов оплаты в приложении.
-
-### FormErrors
-
-Тип ошибки формы ввода
-
-### IBasket
-
-Тип для описания элемента корзины, содержащий информацию о товаре
-
-```ts
-export interface Basket {
-	items: ICard[];
-	addItem: (item: ICard) => void;
-	removeItemById: (id: number) => void;
-	clearBasket: () => void;
-	getItemsNumber: () => number;
-	getCost: () => number;
-}
-```
-
-### IAppState
-
-Тип данных, описывающий состояние приложения, включающий хранение карточек, выбранных товаров, предпросмотра, данных заказа и суммы заказа.
-
-```ts
-export interface IAppState {
-	catalog: IItemCatalogue[];
-	basket: IBasket;
-	// preview: string | null;
-	order: IOrder | null;
-	// loading: boolean;
-}
-```
-
-### IOrderResult
-
-Описывает результат заказа с уникальным идентификатором и суммой. -->
 
 ## View
 
 Каждый UI класс наследуется от `Component<T>` либо сам, либо от родителя. В качестве `Т` каждый класс принимает свой тип данных для рендера. Соответственно параллельно с каждым классом составляется интерфейс для данных рендера, который описывается радом.
 
-<!-- ## Класс "Component"
-
-Абстрактный класс для работы с DOM
-
-```
-"toggleClass" - Переключить класс
-"setText" - Установить текстовое содержимое
-"setDisabled" - Сменить статус блокировки
-"setHidden" - Скрыть
-"setVisible" - Показать
-"setImage" - Установить изображение с алтернативным текстом
-"render" - Вернуть корневой DOM-элемент
-``` -->
-
-### Component
-
-Абстрактный класс, представляет базовый функционал для создания компонентов интерфейса
+### Class `Component<T>`
 
 ![alt text](./uml_images/image-9.png)
 
-- `render()` - используется для обновления данных компонента. Он принимает объект data с частичными данными и применяет их к текущему экземпляру компонента. Возвращает корневой DOM-элемент компонента
+Абстрактный базовый класс, предназначенным для создания компонентов пользовательского интерфейса. Класс обеспечивает инструментарий для управления DOM элементами и поведением компонента. Наследуется всеми классами представления(View)
 
-### Page
+`constructor(container: HTMLElement)` - принимает элемент контейнера, в который будет помещен компонент
 
-Контейнер для управления информацией в элементах топбара и коллекциии каталога
+Методы:
 
+- `toggleClass` - переключается класс для переданного элемента.
+- `setText` - устанавливает текстовое содержимое для переданного элемента.
+- `setImage` - устанавливает изображения и альтернативный текст для изоображения(опционально) для переданного элемента типа HTMLImageElement
+- `setDisabled` - изменяет статус блокировки для переданного элемента
+- `setHidden`, `setVisible` - скрывает,отоброжает переданный элемент
+- `render` - рендерит компонент, используя переданные данные. Метод должен быть переназначен в дочерних классах
+
+### Class `Page`
 ![alt text](./uml_images/image.png)
 
+Класс Page представляет собой компонент пользовательского интерфейса, который управляет отображением страницы. Он наследует функциональность базового класса `Component<IPage>`
+
+`constructor(container: HTMLElement, events: IEvents)` - принимает два параметра: container, который представляет собой элемент контейнера, в который будет помещен компонент, и events, который представляет собой интерфейс для управления событиями в приложении
+
 #### Page UI Class
+
+Свойства: 
 
 - `counter` - элемент счетчика на кнопке корзины
 - `catalog` - контейнер для элементов каталога
 - `wrapper` - контейнер всей страницы. В данном случае используется для блокировки прокрутки при открытии модального окна
 - `basket` - кнопка корзины
-- `set locked()` - выставляет состояние блокировки скролла
+
+Методы:
+
+- `set counter(value: number)`: Устанавливает значение элемента счетчика
+- `set catalog(items: HTMLElement[])`: Обновляет раздел каталога страницы с предоставленными товарами
+- `set locked(value: boolean)` - выставляет состояние блокировки скролла
 
 #### IPage render interface
 
@@ -242,35 +177,55 @@ export interface IAppState {
 - `catalog` - отренедренные элементы класса `CatalogItem` по темплейту `cardCatalogTemplate`
 - `locked` - определение состояния блокировки скролла
 
-### ItemCard
+### Class `ItemCard<T extends IItemCard>`
 
 ![alt text](./uml_images/image-1.png)
 
-Базовый класс для компонент содержащий информацию о товаре  
+Базовый класс для компонент содержащий информацию о товаре. Наследует функциональность базового класса `Component<T extends IItemCard>`
 Поскольку все классы, наследующие данный класс, должны иметь в рендере минимум те же поля, что в `IItemShort`, то тут стоит ограничитель по типу для `T`
 
-#### ItemCard UI class
+`constructor(blockName: string, container: HTMLElement, events: IEvents)`  - принимает три параметра:  blockName, имя, по которому будет тянуться элемент,  container - передается в родительский конструктор, events - параметр объекта событий
+
+Свойства:  
 
 - `title` - контейнер заголовка карточки
 - `price` - контейнер цены карточки
 - `button` - кнопка карточки
 
+Методы: 
+
+- `set id()` - выставялет id элемента
+- `set title()` - выставялет название 
+- `set price()` - выставялет цену  
+
 #### ItemCard render interface
 
 Идентичен модельному классу [IItemShort](#iitemshort)
 
-### CatalogItem
+### Class `CatalogItem`
 
 ![alt text](./uml_images/image-2.png)
 
-Отвечает за отображения двух типов карточек - превью и каталог. В зависимости от выбраного template элемента рендерит карточку catalog/preview
+Отвечает за отображения двух типов карточек - превью и каталог. В зависимости от выбраного template элемента рендерит карточку catalog/preview.  Наследуется от `ItemCard<ICatalogItem>`
 
 #### CatalogItem UI Class
+
+`constructor(blockName: string, container: HTMLElement, events: IEvents)` - не отличается от родительского конструктора 
+
+[ItemCard](#itemcard-render-interface)
+
+Свойства: 
 
 - `category`- элемент категории товара
 - `image`- элемент изображение товара
 - `description`- элемент текстового описания товара
+
+Методы:
+
 - `set buttonState()` - устанваливает состояние кнопки на карточку
+- `set category()` - выставляет категорию товара 
+- `set image()` -	устанваливает  изображение товара 
+- `set description` - устанваливает описание товара 
 
 #### ICatalogItem render interface
 
@@ -278,9 +233,11 @@ export interface IAppState {
 
 - `buttonState` - состояние кнопки
 
-### BasketCard
+### Class `BasketCard`
 
-Карточка товара, находящаяся в корзине.
+Карточка товара, находящаяся в корзине. Наследуется от `ItemCard<IBasketCard>`
+
+`constructor(blockName: string, container: HTMLElement, events: IEvents)`
 
 ![alt text](./uml_images/image-3.png)
 
@@ -294,7 +251,7 @@ export interface IAppState {
 
 - `index` - индекс товара
 
-### Modal
+### Class `Modal`
 
 Общий контейнер для всех модальных окон и вывода на них контента
 
@@ -311,13 +268,13 @@ export interface IAppState {
 
 - `content` - контент который подается для отображения в модальном окне
 
-### Form
+### Class `Form <T extends IFormState>`
 
 Отображает формы на странице и управляет отображением состояния форм.
 
 ![alt text](./uml_images/image-13.png)
 
-### Form UI Class
+#### Form UI Class
 
 - `submit` - элемент конпки для подтверждения формы
 - `error` - элемент вывода ошибки формы
@@ -330,7 +287,7 @@ export interface IAppState {
 - `valid` - состяние валидности
 - `errors` - массив ошибок, который необходимо отрендерить
 
-### Contact
+### Class `Contact`
 
 ![alt text](./uml_images/image-30.png)
 
@@ -345,7 +302,7 @@ export interface IAppState {
 
 Расширяет базовый тип [IOrderFormData](#iorderformdata) и базовый необходимый интерфейс [IFormState](#iformstate-render-interface)
 
-### Payment
+### Класс `Payment`
 
 ![alt text](./uml_images/image-29.png)
 
@@ -365,7 +322,7 @@ export interface IAppState {
 
 Идентичен интерфейсу используемому в [Contact](#contact): [IOrderForm](#iorderform)
 
-### Basket
+### Класс `Basket`
 
 Обеспечивает функциональность для управления отображением содержимого корзины в модальном окне, а также реагирование на пользовательские действия (Кажется это описание для модели)
 
@@ -384,7 +341,7 @@ export interface IAppState {
 - `total` - общая сумма заказа
 - `enable` - состояние кнопки
 
-### Success
+### Класс `Success`
 
 Предназначен для отображения окна с уведомлением об успешном заказе
 
@@ -401,7 +358,7 @@ export interface IAppState {
 
 ## Model layer
 
-### Abstract Model
+### Abstract Class `Model`
 
 Абстрактный класс, служит базовым для всех моделей
 
@@ -409,7 +366,7 @@ export interface IAppState {
 
 - `emitChanges()` - используется для оповещения об изменениях в модели. Он принимает имя события event и необязательный параметр payload, который содержит дополнительные данные для передачи в событие
 
-### AppState
+### Class `AppState`
 
 ![alt text](./uml_images/image-32.png)
 
@@ -419,7 +376,7 @@ export interface IAppState {
 - `basket` - модель корзины заказов
 - `form` - модель формы заказа
 
-### BasketModel
+### Class `BasketModel`
 
 Модель данных корзины
 
@@ -431,7 +388,7 @@ export interface IAppState {
 - `clearBasket()` - очищает корзину товаров
 - `getCost()` - вычисляет общую стоимость товаров в заказе
 
-### ItemCatalogueModel
+### Class `ItemCatalogueModel`
 
 Модель данных товара
 
@@ -443,7 +400,7 @@ export interface IAppState {
 - `getItemById()` - получить товар по id
 - `getItems()` - получить все товары
 
-### OrderFormModel
+### Class `OrderFormModel`
 
 Модель данных заказа
 
@@ -514,3 +471,4 @@ export interface IOrderResult {
 	total: number; // - данные общей стоимости заказа
 }
 ```
+
