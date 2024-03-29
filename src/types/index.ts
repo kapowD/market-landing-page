@@ -19,18 +19,21 @@ export interface IItem extends IItemShort {
 
 export interface IItemCatalogueModel {
 	items: Set<IItem>;
-	addItem: (item: IItem) => void;
+	// addItem: (item: IItem) => void;
 	addItems: (items: IItem[]) => void;
-	getItemByID: (id: IItem) => IItem;
+	getItemByID: (id: string) => IItem | undefined;
 	getItems: () => IItem[];
 }
 
 // + IOrderForm
-export interface IOrderFormData {
+
+export interface IFormData {
 	payment: string;
 	address: string;
 	email: string;
 	phone: string;
+}
+export interface IOrderFormData extends IFormData {
 	items: string[];
 	total: number;
 }
@@ -38,13 +41,16 @@ export interface IOrderFormData {
 export interface IBasketModel {
 	items: IItem[];
 	addItem: (item: IItem) => void;
-	removeItemById: (id: number) => void;
+	removeItemById: (id: string) => void;
 	clearBasket: () => void;
 	getItemsNumber: () => number;
 	getCost: () => number;
+	getItemByID: (id: string) => IItem | undefined;
+	getItems: () => IItem[];
+	getItemsId: () => string[];
 }
 
-export type FormErrors = Partial<Record<keyof IOrderFormData, string>>;
+export type FormErrors = Partial<Record<keyof IFormData, string>>;
 
 export interface IOrderResult {
 	id: string;
@@ -53,18 +59,26 @@ export interface IOrderResult {
 
 export interface IAppState {
 	catalog: IItemCatalogueModel;
-	basket: IBasket;
+	basket: IBasketModel;
 	order: IOrderFormData;
 }
 
-export interface IOrderFormModel extends IOrderFormData{
-	softValidate():boolean;
-	hardValidate():boolean;
+export type FormType = 'contacts' | 'order';
+
+export interface IOrderFormModel extends IOrderFormData {
+	softValidate(type: FormType): boolean;
+	hardValidate(type: FormType): boolean;
+	getFormData(): IOrderFormData;
+	clearOrder(): void;
+	setFormField(data: {
+		field: keyof IFormData;
+		value: string;
+	}): IOrderFormModel;
 }
 //SECTION: VIEWS
 
 export interface ISuccess {
-	description: string;
+	description: number;
 }
 
 export interface IPage {
@@ -79,11 +93,11 @@ export interface IItemShort {
 	price: number;
 }
 
-export interface ICatalogItem {
+export interface ICatalogItem extends IItem {
 	buttonState: boolean;
 }
 
-export interface IBasketCard {
+export interface IBasketCard extends IItemShort {
 	index: number;
 }
 
@@ -93,7 +107,7 @@ export interface IModalData {
 
 export interface IFormState {
 	valid: boolean;
-	errors: string[];
+	errors: FormErrors;
 }
 
 export interface IOrderForm extends IOrderFormData, IFormState {}
