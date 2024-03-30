@@ -1,5 +1,5 @@
-import { Api } from './api';
-import { IOrderFormData, IOrderResult, IItem } from '../../types';
+import { Api } from './base/API';
+import { IOrderFormData, IOrderResult, IItem } from '../types';
 
 export interface IShopAPI {
 	getProductList: () => Promise<IItem[]>;
@@ -31,7 +31,7 @@ export class ShopAPI extends Api implements IShopAPI {
 				}))
 		);
 	}
-    
+
 	orderProducts(order: IOrderFormData): Promise<IOrderResult> {
 		return this.post('/order', order).then((data: IOrderResult) => data);
 	}

@@ -66,7 +66,6 @@ export interface IAppState {
 export type FormType = 'contacts' | 'order';
 
 export interface IOrderFormModel extends IOrderFormData {
-	softValidate(type: FormType): boolean;
 	hardValidate(type: FormType): boolean;
 	getFormData(): IOrderFormData;
 	clearOrder(): void;

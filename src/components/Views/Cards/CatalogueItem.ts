@@ -1,6 +1,6 @@
 import { ItemCard } from './ItemCard';
 import { Category, ICatalogItem } from '../../../types';
-import { IEvents } from '../../base/events';
+import { IEvents } from '../../base/Events';
 
 export class CatalogueItem extends ItemCard<ICatalogItem> {
 	protected _description: HTMLElement;
@@ -46,15 +46,16 @@ export class CatalogueItem extends ItemCard<ICatalogItem> {
 		}
 	}
 
-	set buttonState(val: boolean){
-        this.setDisabled(this._button, !val)
-    }
+	set buttonState(val: boolean) {
+		this.setDisabled(this._button, !val);
+	}
 
 	set category(value: Category) {
 		this.setText(this._category, value);
 		this._category.classList.add(
 			`card__category_${CatalogueItem.remapCategory2Class.get(value)}`
 		);
+		
 	}
 
 	set image(value: string) {

@@ -1,94 +1,96 @@
-import {IEvents} from "../base/events";
-import {Model} from "../base/Model";
-import {FormErrors, FormType, IFormData, IOrderFormData, IOrderFormModel} from "../../types";
+import { IEvents } from '../base/Events';
+import { Model } from '../base/Model';
+import {
+	FormErrors,
+	FormType,
+	IFormData,
+	IOrderFormData,
+	IOrderFormModel,
+} from '../../types';
 
-export class OrderFormModel extends Model<IOrderFormData> implements IOrderFormModel{
-    phone = ""
-    address = ""
-    email = ""
-    payment = "";
+export class OrderFormModel
+	extends Model<IOrderFormData>
+	implements IOrderFormModel
+{
+	phone = '';
+	address = '';
+	email = '';
+	payment = '';
 
-    constructor(events: IEvents) {
-        super({}, events);
-    }
+	constructor(events: IEvents) {
+		super({}, events);
+	}
 
-    items: string[];
-    total: number;
+	items: string[];
+	total: number;
 
-    hardValidate(type: FormType): boolean {
-        console.log('hardValidate on', type);
-        const errorMessage: FormErrors = {}
-        if(type === 'contacts'){
+	hardValidate(type: FormType): boolean {
+		console.log('hardValidate on', type);
+		const errorMessage: FormErrors = {};
+		if (type === 'contacts') {
+			const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z]+$/;
+			if (this.email.length === 0) {
+				errorMessage.email = 'Электронная почта должна быть заполнена';
+			} else if (!emailRegex.test(this.email)) {
+				errorMessage.email = 'Электронная почта в неверном формате';
+			}
 
-            const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z]+$/;
-            if(this.email.length === 0){
-                errorMessage.email = 'Электронная почта должна быть заполнена'
-            } else if (!emailRegex.test(this.email)) {
-                errorMessage.email = 'Электронная почта в неверном формате'
-            }
+			const phoneRegex = /^\+7\d{10}$/;
+			if (this.phone.length === 0) {
+				errorMessage.phone = 'Номер телефона должен быть заполнен';
+			} else if (!phoneRegex.test(this.phone)) {
+				errorMessage.phone =
+					'Номер телефона должен быть в формате +7XXXXXXXXXX';
+			}
+		} else if (type === 'order') {
+			if (this.payment.length === 0) {
+				errorMessage.payment = 'Тип оплаты должен быть выбран';
+			} else if (this.payment !== 'cash' && this.payment !== 'card') {
+				errorMessage.payment =
+					'Тип оплаты должен быть либо наличными, либо картой';
+			}
 
-            const phoneRegex = /^\+7\d{10}$/;
-            if(this.phone.length === 0){
-                errorMessage.phone = 'Номер телефона должен быть заполнен'
-            } else if (!phoneRegex.test(this.phone)) {
-                errorMessage.phone = 'Номер телефона должен быть в формате +7XXXXXXXXXX'
-            }
+			// eslint-disable-next-line
+			const addressRegex = /^[a-zA-Zа-яА-Я0-9\s\d,-\/№]+$/u;
+			if (this.address.length === 0) {
+				errorMessage.address = 'Адрес доставки должен быть заполнен';
+			} else if (!addressRegex.test(this.address)) {
+				errorMessage.address =
+					'Адрес должен содержать только буквы, цифры и знаки препинания';
+			}
+		}
 
-        } else if(type === 'order'){
+		console.log('Emitting error messages', errorMessage);
 
+		this.emitChanges(`${type}:errors`, errorMessage);
+		return Object.keys(errorMessage).length === 0;
+	}
 
-            if(this.payment.length === 0){
-                errorMessage.payment = 'Тип оплаты должен быть выбран'
-            } else if(this.payment !== 'cash' && this.payment !== 'card'){
-                errorMessage.payment = 'Тип оплаты должен быть либо наличными, либо картой'
-            }
+	getFormData(): IOrderFormData {
+		return {
+			email: this.email,
+			phone: this.phone,
+			address: this.address,
+			payment: this.payment,
+			items: this.items,
+			total: this.total,
+		};
+	}
 
-            // eslint-disable-next-line
-            const addressRegex = /^[a-zA-Zа-яА-Я0-9\s\d,-\/№]+$/u
-            if(this.address.length === 0){
-                errorMessage.address = 'Адрес доставки должен быть заполнен'
-            } else if(!addressRegex.test(this.address)){
-                errorMessage.address = 'Адрес должен содержать только буквы, цифры и знаки препинания'
-            }
+	setFormField(data: {
+		field: keyof IFormData;
+		value: string;
+	}): IOrderFormModel {
+		this[data.field] = data.value;
+		return this;
+	}
 
-        }
-
-        console.log('Emitting error messages', errorMessage)
-
-        this.emitChanges(`${type}:errors`, errorMessage)
-        return Object.keys(errorMessage).length === 0
-    }
-
-    softValidate(type: FormType): boolean {
-        if(type === 'contacts'){
-            return this.email.length > 0 && this.phone.length > 0
-        } else if(type === 'order'){
-            return this.payment.length > 0 && this.address.length > 0
-        }
-    }
-
-    getFormData(): IOrderFormData {
-        return {
-            email: this.email,
-            phone: this.phone,
-            address: this.address,
-            payment: this.payment,
-            items: this.items,
-            total: this.total
-        }
-    }
-
-    setFormField(data:{field: keyof IFormData, value: string}): IOrderFormModel{
-        this[data.field] = data.value
-        return this
-    }
-
-    clearOrder(): void {
-        this.email = ""
-        this.phone = ""
-        this.address = ""
-        this.payment = ""
-        this.items = []
-        this.total = 0
-    }
+	clearOrder(): void {
+		this.email = '';
+		this.phone = '';
+		this.address = '';
+		this.payment = '';
+		this.items = [];
+		this.total = 0;
+	}
 }
