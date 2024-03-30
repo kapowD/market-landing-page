@@ -29,12 +29,12 @@ export class Modal extends Component<IModalData> {
 	}
 
 	open() {
-		this.toggleClass(this.container, 'modal_active');
+		this.toggleClass(this.container, 'modal_active', true);
 		this.events.emit('modal:opened');
 	}
 
 	close() {
-		this.toggleClass(this.container, 'modal_active');
+		this.toggleClass(this.container, 'modal_active', false);
 		this.events.emit('modal:closed');
 		this.content = null;
 	}

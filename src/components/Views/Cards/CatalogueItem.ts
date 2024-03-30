@@ -52,10 +52,7 @@ export class CatalogueItem extends ItemCard<ICatalogItem> {
 
 	set category(value: Category) {
 		this.setText(this._category, value);
-		this._category.classList.add(
-			`card__category_${CatalogueItem.remapCategory2Class.get(value)}`
-		);
-		
+		this.toggleClass(this._category, `card__category_${CatalogueItem.remapCategory2Class.get(value)}`, true)
 	}
 
 	set image(value: string) {

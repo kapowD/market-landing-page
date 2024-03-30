@@ -22,8 +22,9 @@ export class Payment extends Form<IOrderForm>{
 
     selectPayment(name: string): void{
         this.buttons.forEach((button) => {
-            button.classList.toggle('button_alt-active', button.name === name);
+            this.toggleClass(button, 'button_alt-active', button.name === name);
         })
+        console.log(this.buttons)
     }
 
     unselectPayment(): void{
